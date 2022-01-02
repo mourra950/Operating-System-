@@ -117,5 +117,5 @@ struct proc
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];
-  int prio; // Process name (debugging)
+  int priority=5; // integer that represents the process priority.important to use the priority based scheduling.
 };

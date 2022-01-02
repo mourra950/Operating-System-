@@ -463,6 +463,62 @@ scheduler(void)
     }
   }
 }
+/*
+priority based algorithm 
+void
+scheduler(void)
+{
+  //we created another process pointer so we can iterate over the process table 
+  //and find the highest priority process to run.
+
+  struct proc *p,*pComp;
+  struct cpu *c = mycpu();
+  c->proc = 0;
+
+
+
+  for(;;){
+    // Avoid deadlock by ensuring that devices can interrupt.
+    intr_on();
+    struct proc *HPP = 0;
+    // HPP represent high priority process init with zero to start searching for the process
+    
+    for(p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p->lock);
+      if(p->state == RUNNABLE) {
+      HPP = p; 
+      for(pComp = proc; pCOmp < &proc[NPROC]; pComp++)
+      {
+      if(pComp->state == RUNNABLE)
+        {
+          if(HPP->priority  < pComp->priority)
+          {
+           HPP=pComp; 
+          }
+        }
+      } 
+        p=HPP;
+        cprintf("debug log\n");
+        cprintf("\n<Process: %d Priority: %d Size %d>\n",p->pid,p->priority,p->sz);
+        p->state = RUNNING;
+        c->proc = p;
+
+        swtch(&c->context, &p->context);
+        
+        if(p->priority<20)
+        {
+          p->priority++;
+        }
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+      }
+      release(&p->lock);
+    }
+  }
+}
+*/
 
 // Switch to scheduler.  Must hold only p->lock
 // and have changed proc->state. Saves and restores

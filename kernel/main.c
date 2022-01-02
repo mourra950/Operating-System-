@@ -40,6 +40,6 @@ main()
     trapinithart();   // install kernel trap vector
     plicinithart();   // ask PLIC for device interrupts
   }
-
+//entry point for the sched(mourra)
   scheduler();        
 }
