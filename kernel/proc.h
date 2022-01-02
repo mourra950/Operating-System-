@@ -92,6 +92,11 @@ enum procstate
   RUNNING,
   ZOMBIE
 };
+enum MFQ
+{
+  no,
+  yes
+}; //enum for the MFQ implementation
 
 // Per-process state
 struct proc
@@ -109,9 +114,9 @@ struct proc
   struct proc *parent; // Parent process
 
   // these are private to the process, so p->lock need not be held.
-  uint64 kstack;               // Virtual address of kernel stack
-  //sz is calculated by the operating and this field will be used to determine which process will be used first 
-  //in all algorithms if needed 
+  uint64 kstack; // Virtual address of kernel stack
+  //sz is calculated by the operating and this field will be used to determine which process will be used first
+  //in all algorithms if needed
   uint64 sz;                   // Size of process memory (bytes)
   pagetable_t pagetable;       // User page table
   struct trapframe *trapframe; // data page for trampoline.S
@@ -119,5 +124,6 @@ struct proc
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];
-  int priority=5; // integer that represents the process priority.important to use the priority based scheduling.
+  int priority = 5; // integer that represents the process priority.important to use the priority based scheduling.
+  enum MFQ lvl_0;   // enum check that the process has eneterd level 0  feedback queue
 };
