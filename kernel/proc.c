@@ -125,6 +125,8 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
+  p->priority = 5;
+  p->lvl_0 = no; //the process at the begining of the allocation  didnt pass level 0 queue
 
   // Allocate a trapframe page.
   if ((p->trapframe = (struct trapframe *)kalloc()) == 0)
@@ -595,6 +597,86 @@ scheduler(void)
   }
 }
 */
+
+void scheduler(void)
+{
+  struct proc *p;
+  struct proc *pComp;
+  struct cpu *c = mycpu();
+  c->proc = 0;
+  struct proc *hpp = 0; // points to a high priority process
+      // Loop over process table looking for process to run.
+  for (;;)
+  {
+
+    // Enable interrupts on this processor.
+
+    intr_on();
+
+    // Loop over process table looking for process to run.
+
+    int count = 0;
+    for (p = proc; p < &proc[NPROC]; p++)
+    {
+      acquire(&p->lock);
+      count++;
+      if (count == NPROC)
+        break;
+      if (p->state != RUNNABLE || p->lvl_0 == yes)
+      {
+        continue;
+      }
+      cprintf("\nprocess number %d with priority %d entered roundrobin schedular\n", p->pid, p->priority);
+      // Switch to chosen process.  It is the process's job
+      // to release ptable.lock and then reacquire it
+      // before jumping back to us.
+      c->proc = p;
+
+      p->state = RUNNING;
+      swtch(&(c->context), p->context);
+
+      p->lvl_0 = yes;
+      // Process is done running for now.
+      // It should have changed its p->state before coming back.
+      c->proc = 0;
+    }
+    release(&p->lock);
+
+    for (p = proc; p < &proc[NPROC]; p++)
+    {
+      acquire(&p->lock);
+      if (p->state != RUNNABLE)
+        continue;
+      hpp = p; // put p as a high prioity process
+      for (pComp = proc; pComp < &proc[NPROC]; pComp++)
+      {
+        if (pComp->state != RUNNABLE)
+          continue;
+        if (hpp->priority < pComp->priority) //found a process with higher priority (lower value)
+          hpp = pComp;
+      }
+
+      // Switch to chosen process.  It is the process's job
+      // to release ptable.lock and then reacquire it
+      // before jumping back to us.
+      p = hpp;
+      cprintf("<\nProcess: %d Priority: %d Size %d entered priority>\n", p->pid, p->priority, p->sz);
+      c->proc = p;
+
+      p->state = RUNNING;
+      swtch(&(c->context), p->context);
+
+      p->lvl_0 = no;
+      if (p->priority < 10)
+        //change process priority as long as it was ran once before
+        p->priority++;
+      // Process is done running for now.
+      // It should have changed its p->state before coming back.
+      c->proc = 0;
+    }
+    release(&p->lock);
+  }
+}
 
 // Switch to scheduler.  Must hold only p->lock
 // and have changed proc->state. Saves and restores
