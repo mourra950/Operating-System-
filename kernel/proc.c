@@ -540,47 +540,48 @@ scheduler(void)
   }
 }
 */
-/*
+
 //shortest job first algorithm code
-void
-scheduler(void)
+/*void scheduler(void)
 {
-  struct proc *p,*pComp;
+  struct proc *p, *pComp;
   struct cpu *c = mycpu();
-  
+
   c->proc = 0;
-  for(;;){
+  for (;;)
+  {
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
     struct proc *sjf = 0;
-    uint mSize = __UINT32_MAX__;
+    uint maxSize = UINT_MAX;
 
-    for(p = proc; p < &proc[NPROC]; p++) {
+    for (p = proc; p < &proc[NPROC]; p++)
+    {
       acquire(&p->lock);
-      if(p->state == RUNNABLE) {
-        if(p->sz < maxSize)
+      if (p->state == RUNNABLE)
+      {
+        if (p->sz < maxSize)
         {
           sjf = p;
         }
 
-      for(pComp = proc; pComp < &proc[NPROC]; pComp++)
-      {
-        if(p->state == RUNNABLE)
+        for (pComp = proc; pComp < &proc[NPROC]; pComp++)
         {
-          if(shortestJob->sz > pComp->sz)
+          if (p->state == RUNNABLE)
           {
-            shortestJob = p1;
+            if (sjf->sz > pComp->sz)
+            {
+              sjf = pComp;
+            }
           }
         }
-
-      }
-      cprintf("debug log\n");
-      cprintf("shortestJob %d \n", sjf->sz);
+        cprintf("debug log\n");
+        cprintf("shortestJob %d \n", sjf->sz);
 
         // Switch to chosen process.  It is the process's job
         // to release its lock and then reacquire it
         // before jumping back to us.
-        p=sjf;
+        p = sjf;
         p->state = RUNNING;
         c->proc = p;
         swtch(&c->context, &p->context);
@@ -594,9 +595,6 @@ scheduler(void)
   }
 }
 */
-
-
-
 
 // Switch to scheduler.  Must hold only p->lock
 // and have changed proc->state. Saves and restores
