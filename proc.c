@@ -487,7 +487,7 @@ scheduler(void)
   c->proc = 0;
   
   for(;;){
-    // Enable interrupts on this processor.
+     Enable interrupts on this processor.
     sti();
     struct proc *high_priority_process = 0;   // points to a high priority process
     // Loop over process table looking for process to run.
